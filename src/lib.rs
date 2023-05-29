@@ -12,6 +12,8 @@ use bevy_egui::EguiSet;
 use egui::EguiWantsFocus;
 use std::f32::consts::{PI, TAU};
 
+#[cfg(feature = "bevy-inspector-egui")]
+use bevy_inspector_egui::{inspector_options::std_options::*, prelude::*};
 #[cfg(feature = "bevy_egui")]
 mod egui;
 mod util;
@@ -38,6 +40,9 @@ impl Plugin for PanOrbitCameraPlugin {
                     .chain()
                     .in_base_set(PanOrbitCameraSystemSet),
             );
+
+        #[cfg(feature = "bevy-inspector-egui")]
+        app.register_type::<PanOrbitCamera>();
 
         #[cfg(feature = "bevy_egui")]
         {
@@ -88,7 +93,12 @@ pub struct PanOrbitCameraSystemSet;
 ///         ));
 ///  }
 /// ```
-#[derive(Component, Copy, Clone, Debug, PartialEq)]
+#[derive(Component, Copy, Clone, Debug, PartialEq, Reflect)]
+#[cfg_attr(
+    feature = "bevy-inspector-egui",
+    derive(InspectorOptions),
+    reflect(InspectorOptions)
+)]
 pub struct PanOrbitCamera {
     /// The point to orbit around, and what the camera looks at. Automatically updated when
     /// panning the camera.
@@ -100,6 +110,7 @@ pub struct PanOrbitCamera {
     /// initialization.
     /// Automatically updated.
     /// Defaults to `None`.
+    #[cfg_attr(feature = "bevy-inspector-egui", inspector(min = 0.0))]
     pub radius: Option<f32>,
     /// Rotation in radians around the global Y axis (longitudinal). Updated automatically.
     /// If both `alpha` and `beta` are `0.0`, then the camera will be looking forward, i.e. in
@@ -108,6 +119,7 @@ pub struct PanOrbitCamera {
     /// initialization.
     /// You should not update this after initialization - use `target_alpha` instead.
     /// Defaults to `None`.
+    #[reflect(ignore)]
     pub alpha: Option<f32>,
     /// Rotation in radians around the local X axis (latitudinal). Updated automatically.
     /// If both `alpha` and `beta` are `0.0`, then the camera will be looking forward, i.e. in
@@ -116,6 +128,7 @@ pub struct PanOrbitCamera {
     /// initialization.
     /// You should not update this after initialization - use `target_beta` instead.
     /// Defaults to `None`.
+    #[reflect(ignore)]
     pub beta: Option<f32>,
     /// The target alpha value. The camera will smoothly transition to this value. Updated
     /// automatically, but you can also update it manually to control the camera independently of
@@ -148,6 +161,7 @@ pub struct PanOrbitCamera {
     /// How much smoothing is applied to the orbit motion. A value of `0.0` disables smoothing,
     /// so there's a 1:1 mapping of input to camera position. A value of `1.0` is infinite
     /// smoothing. Defaults to `0.8`.
+    #[cfg_attr(feature = "bevy-inspector-egui", inspector(min = 0.0, max = 1.0, display = NumberDisplay::Slider))]
     pub orbit_smoothness: f32,
     /// The sensitivity of the panning motion. Defaults to `1.0`.
     pub pan_sensitivity: f32,

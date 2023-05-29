@@ -63,6 +63,7 @@ If `alpha` and `beta` are both `0.0`, then the camera will be looking directly f
 ## Cargo Features
 
 - `bevy_egui`: makes PanOrbitCamera ignore input when interacting with egui widgets/windows
+- `bevy-inspector-egui`: Add some 
 
 ## Version Compatibility
 
